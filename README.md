@@ -82,8 +82,9 @@ You can make users **moderators**. They will then be able to **delete any post**
 
 #### Multi-users support
 
-LDAP and HTTP auth are not supported?
-The app can be used by multiple users?
+LDAP and HTTP auth are not supported.
+
+The app can be used by multiple users.
 
 #### Supported architectures
 
