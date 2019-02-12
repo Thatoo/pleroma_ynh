@@ -63,7 +63,6 @@ Go to **cd /var/www/pleroma/pleroma**.
     
 This will generate a **password reset link** that you can then send to the user.
 
-
 ### Moderators
 
 You can make users **moderators**. They will then be able to **delete any post**.
