@@ -19,7 +19,7 @@ old_domain=$YNH_APP_OLD_DOMAIN
 old_path=$YNH_APP_OLD_PATH
 
 new_domain=$YNH_APP_NEW_DOMAIN
-new_path="/"
+new_path=$YNH_APP_NEW_PATH
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -104,7 +104,7 @@ ynh_systemd_action --action=stop --service_name=$app
 # MODIFY A CONFIG FILE
 #=================================================
 
-ynh_replace_string "$old_domain" "$new_domain" "$final_path/$app/config/prod.secret.exs"
+ynh_replace_string "$old_domain$old_path" "$new_domain$new_path" "$final_path/$app/config/prod.secret.exs"
 
 #=================================================
 # START SERVICE

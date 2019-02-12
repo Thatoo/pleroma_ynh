@@ -27,7 +27,7 @@ ynh_abort_if_errors
 ynh_print_info "Retrieve arguments from the manifest ..."
 
 domain=$YNH_APP_ARG_DOMAIN
-path_url="/"
+path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 password=$YNH_APP_ARG_PASSWORD
@@ -230,7 +230,7 @@ ynh_print_info "Configuring php-fpm ..."
 
 cp -f ../conf/generated_config.exs "$final_path/$app/config/prod.secret.exs"
 
-ynh_replace_string "__DOMAIN__"        "$domain"        "$final_path/$app/config/prod.secret.exs"
+ynh_replace_string "__DOMAIN_URI__"        "$domain$path_url"        "$final_path/$app/config/prod.secret.exs"
 ynh_replace_string "__KEY__"           "$random_key"    "$final_path/$app/config/prod.secret.exs"
 ynh_replace_string "__INSTANCE_NAME__" "$name"          "$final_path/$app/config/prod.secret.exs"
 ynh_replace_string "__DB_NAME__"       "$db_name"           "$final_path/$app/config/prod.secret.exs"
