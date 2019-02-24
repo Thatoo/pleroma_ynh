@@ -24,7 +24,6 @@ ynh_abort_if_errors
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
-ynh_print_info "Retrieve arguments from the manifest ..."
 
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
@@ -60,7 +59,7 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
-ynh_print_info "Validating arguments ..."
+ynh_print_info "Validating installation parameters..."
 
 ### If the app uses nginx as web server (written in HTML/PHP in most cases), the final path should be "/var/www/$app".
 ### If the app provides an internal web server (or uses another application server such as uwsgi), the final path should be "/opt/yunohost/$app"
@@ -76,7 +75,7 @@ ynh_webpath_register $app $domain $path_url
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
-ynh_print_info "Store settings from manifest ..."
+ynh_print_info "Storing installation settings..."
 
 ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
@@ -108,6 +107,20 @@ port=$(ynh_find_port 8095)
 ynh_app_setting_set $app port $port
 
 #=================================================
+# INSTALL ERLANG and ELIXIR
+#=================================================
+ynh_print_info "Installing erlang and elixir ..."
+
+if [ "$(lsb_release --codename --short)" == "jessie" ]; then
+	sudo apt install -y ../conf/esl-erlang_21.2.6-1~debian~jessie_amd64.deb
+	sudo apt install -y ../conf/elixir_1.8.1-2~debian~jessie_amd64.deb
+elif 
+	[ "$(lsb_release --codename --short)" == "stretch" ]; then
+	sudo apt install -y ../conf/esl-erlang_21.2.6-1~debian~stretch_amd64.deb
+	sudo apt install -y ../conf/elixir_1.8.1-2~debian~stretch_amd64.deb
+fi
+
+#=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 ynh_print_info "Installing dependencies ..."
@@ -119,24 +132,12 @@ ynh_print_info "Installing dependencies ..."
 ###		- As well as the section "REINSTALL DEPENDENCIES" in the restore script
 ###		- And the section "UPGRADE DEPENDENCIES" in the upgrade script
 
-# Add erlang for Debian Jessie 
-
-if [ "$(lsb_release --codename --short)" == "jessie" ]; then
-	echo "deb http://packages.erlang-solutions.com/debian jessie contrib" | tee /etc/apt/sources.list.d/erlang-solutions.list
-elif 
-	[ "$(lsb_release --codename --short)" == "stretch" ]; then
-	echo "deb http://packages.erlang-solutions.com/debian stretch contrib" | tee /etc/apt/sources.list.d/erlang-solutions.list
-fi
-sudo wget https://packages.erlang-solutions.com/debian/erlang_solutions.asc
-sudo apt-key add erlang_solutions.asc
-sudo rm erlang_solutions.asc
-
-# install dependencies
 ynh_install_app_dependencies git build-essential openssl ssh sudo postgresql postgresql-contrib elixir erlang-dev erlang-parsetools erlang-xmerl erlang-tools
 
 #=================================================
 # CREATE A POSTGRESQL DATABASE
 #=================================================
+ynh_print_info "Creating a PostgreSQL database..."
 
 ### Use these lines if you need a database for the application.
 ### `ynh_psql_test_if_first_run` will create a master password and set up global settings.
@@ -154,9 +155,11 @@ ynh_psql_create_user "$app" "$db_pwd"
 ynh_psql_execute_as_root \
 "CREATE DATABASE $db_name ENCODING 'UTF8' LC_COLLATE='C' LC_CTYPE='C' template=template0 OWNER $db_name;"
 ynh_psql_execute_as_root "\connect $db_name 
-CREATE EXTENSION IF NOT EXISTS unaccent;CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+CREATE EXTENSION IF NOT EXISTS unaccent;"
 ynh_psql_execute_as_root "\connect $db_name 
-CREATE EXTENSION IF NOT EXISTS unaccent;CREATE EXTENSION IF NOT EXISTS citext;"
+CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+ynh_psql_execute_as_root "\connect $db_name 
+CREATE EXTENSION IF NOT EXISTS citext;"
 ynh_psql_execute_as_root "\connect $db_name 
 CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
 
@@ -171,13 +174,12 @@ ynh_print_info "Setting up source files ..."
 
 ynh_app_setting_set $app final_path $final_path
 # Download, check integrity, uncompress and patch the source from app.src
-#ynh_setup_source "$final_path/$app"
-git clone https://git.pleroma.social/pleroma/pleroma "$final_path/$app"
+ynh_setup_source "$final_path/$app"
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_print_info "Configuring nginx ..."
+ynh_print_info "Configuring nginx web server..."
 
 ### `ynh_add_nginx_config` will use the file conf/nginx.conf
 
@@ -405,7 +407,7 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_print_info "Reloading nginx ..."
+ynh_print_info "Reloading nginx web server..."
 
 systemctl reload nginx
 
@@ -419,4 +421,4 @@ ynh_systemd_action --action=start --service_name=$app --log_path=systemd --line_
 # END OF SCRIPT
 #=================================================
 
-ynh_print_info "Installation completed"
+ynh_print_info "Installation of $app completed"

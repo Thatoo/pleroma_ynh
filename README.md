@@ -25,7 +25,7 @@ For user friendly details about Pleroma: [see here](https://blog.soykaf.com/post
 - Tootdon (Android + iOS)
 - Tootle (iOS)
 
-**Shipped version:** 0.9.0
+**Shipped version:** 0.9.9
 
 ## Important points to read before installing
 
@@ -37,10 +37,6 @@ For user friendly details about Pleroma: [see here](https://blog.soykaf.com/post
 ## Screenshots
 
 ![pleroma-screenshot1](https://user-images.githubusercontent.com/30271971/52231733-ff136500-28ba-11e9-902a-18f80e627db3.png)
-
-## License
-
-**LICENSE:** AGPL-3.0
 
 ## Demo
 
@@ -116,4 +112,3 @@ sudo yunohost app install https://github.com/YunoHost-Apps/pleroma_ynh/tree/test
 or
 sudo yunohost app upgrade pleroma -u https://github.com/YunoHost-Apps/pleroma_ynh/tree/testing --debug
 ```
-
